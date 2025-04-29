@@ -3,7 +3,7 @@
 [DEFAULT]
 
 [quotas]
-default_load_balancer_quota=10
+default_load_balancer_quota=0
 default_listener_quota=100
 default_member_quota=200
 default_pool_quota=100
