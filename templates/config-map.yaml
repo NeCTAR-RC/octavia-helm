@@ -1,0 +1,6 @@
+{{- include "nectarlib.configmap" (list . "octavia.configmap") -}}
+{{- define "octavia.configmap" -}}
+data:
+  api_audit_map.conf: |
+{{- include "octavia-audit-map" . | indent 4 }}
+{{- end -}}

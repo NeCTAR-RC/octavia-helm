@@ -1,0 +1,221 @@
+# Default values for heat
+
+conf:
+  keystone:
+    auth_url:
+    username: octavia
+    project_name: service
+    memcached_servers: []
+  controller_worker:
+    amp_flavor_id:
+    amp_image_owner_id:
+    amp_secgroup_list:
+    amp_boot_network_list:
+  health_manager:
+    controller_ip_port_list:
+  nectar:
+    default_availablity_zone:
+  haproxy_amphora:
+    http_proxy:
+  ovn:
+    ovn_nb_connection:
+    ovn_sb_connection:
+  
+vault:
+  role: k8s
+  settings_secret: 'path/to/secret/in/vault'
+  certs: 'path/to/secret/in/vault'
+  ovn_certs: 'path/to/secret/in/vault'
+job:
+  db_sync:
+    enabled: true
+    command:
+      - octavia-db-manage
+      - upgrade
+      - head
+
+api:
+  name: octavia-api
+  port: 9876
+  command:
+    - kolla_httpd_start
+  apache:
+    enabled: true
+    wsgi_script: octavia-wsgi
+  image:
+    repository: "registry.rc.nectar.org.au/kolla/ubuntu-source-octavia-api"
+  replicaCount: 1
+  pdb:
+    enabled: false
+    minAvailable: 1
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  affinity: {}
+  resources: {}
+  volumes:
+    - name: octavia-run
+      emptyDir: {}
+  volume_mounts:
+    - name: octavia-run
+      mountPath: /var/run/octavia
+  ingress:
+    enabled: false
+  gateway:
+    enabled: false
+    annotations: {}
+    hostname: chart-example.local
+    parentRefs:
+      - name: default
+  extra_container:
+    name: octavia-driver-agent
+    image:
+      repository: "registry.rc.nectar.org.au/kolla/ubuntu-source-octavia-driver-agent"
+    command:
+      - octavia-driver-agent
+
+
+health_manager:
+  name: octavia-health-manager
+  port: 5555
+  port_name: health-manager
+  protocol: UDP
+  healthchecks: false
+  command:
+    - octavia-health-manager
+  apache:
+    enabled: false
+  image:
+    repository: "registry.rc.nectar.org.au/kolla/ubuntu-source-octavia-health-manager"
+  replicaCount: 1
+  pdb:
+    enabled: false
+    minAvailable: 1
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  affinity: {}
+  resources: {}
+  ingress:
+    enabled: false
+  gateway:
+    enabled: false
+    kind: UDPRoute
+    apiVersion: "gateway.networking.k8s.io/v1alpha2"
+    annotations: {}
+    parentRefs:
+      - name: default
+
+
+worker:
+  name: octavia-worker
+  command:
+    - octavia-worker
+  image:
+    repository: "registry.rc.nectar.org.au/kolla/ubuntu-source-octavia-worker"
+  replicaCount: 1
+  pdb:
+    enabled: false
+    minAvailable: 1
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  affinity: {}
+  resources: {}
+
+
+housekeeping:
+  name: octavia-housekeeping
+  command:
+    - octavia-housekeeping
+  image:
+    repository: "registry.rc.nectar.org.au/kolla/ubuntu-source-octavia-housekeeping"
+  replicaCount: 1
+  pdb:
+    enabled: false
+    minAvailable: 1
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  affinity: {}
+  resources: {}
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "1"
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+
+oslo_policy:
+  'context_is_admin': 'role:admin'
+  'load-balancer:admin': 'is_admin:True or role:admin'
+  'load-balancer:global_observer': 'role:read_only or role:monitoring or role:helpdesk or role:cloud_admin'
+  'load-balancer:member_and_owner': 'role:member and rule:load-balancer:owner'
+  'load-balancer:read-quota': 'rule:load-balancer:observer_and_owner or rule:load-balancer:global_observer or rule:load-balancer:member_and_owner or role:QuotaAdmin or rule:load-balancer:admin'
+  'load-balancer:read-quota-global': 'rule:load-balancer:global_observer or role:quotaadmin or rule:load-balancer:admin'
+  'load-balancer:write-quota': 'role:quotaadmin'
+  'os_load-balancer_api:amphora:get_all': 'rule:load-balancer:read-global'
+  'os_load-balancer_api:amphora:get_one': 'rule:load-balancer:read-global'
+  'os_load-balancer_api:amphora:get_stats': 'rule:load-balancer:read-global'
+
+image:
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 42437
+  runAsGroup: 42437
+  fsGroup: 42437
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+service:
+  type: ClusterIP
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
