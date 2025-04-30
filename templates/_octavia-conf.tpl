@@ -36,7 +36,7 @@ auth_type=password
 
 [nova]
 enable_anti_affinity=True
-anti_affinity_policy=soft-anti-affinity
+anti_affinity_policy={{ .Values.conf.nova.anti_affinity_policy }}
 
 [oslo_messaging]
 topic=octavia-rpc
