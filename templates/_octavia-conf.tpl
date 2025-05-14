@@ -81,6 +81,8 @@ ca_private_key=/etc/octavia/certs/server_ca_key.pem
 
 [database]
 connection_recycle_time=600
+max_pool_size = 30
+max_overflow = 50
 
 [cache]
 backend=oslo_cache.memcache_pool
