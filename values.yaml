@@ -64,8 +64,6 @@ api:
   volume_mounts:
     - name: octavia-run
       mountPath: /var/run/octavia
-  ingress:
-    enabled: false
   gateway:
     enabled: false
     annotations: {}
@@ -104,8 +102,6 @@ health_manager:
     values: []
   affinity: {}
   resources: {}
-  ingress:
-    enabled: false
   gateway:
     enabled: false
     kind: UDPRoute
