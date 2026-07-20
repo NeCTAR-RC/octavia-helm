@@ -66,4 +66,11 @@ vault.hashicorp.com/agent-inject-template-ovn_key.pem: |
   {{ print "{{- with secret \"" .Values.vault.ovn_certs "\" -}}" }}
   {{ print "{{ .Data.data.key }}" }}
   {{ print "{{- end -}}" }}
+{{- if .Values.sentry.enabled }}
+vault.hashicorp.com/agent-inject-secret-sentry.env: "{{ .Values.vault.settings_secret }}"
+vault.hashicorp.com/agent-inject-template-sentry.env: |
+  {{ print "{{- with secret \"" .Values.vault.settings_secret "\" -}}" }}
+  {{ print "{{- with .Data.data.sentry_dsn }}SENTRY_DSN={{ . }}{{ end }}" }}
+  {{ print "{{- end -}}" }}
+{{- end }}
 {{- end }}
