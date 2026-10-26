@@ -2,8 +2,8 @@ apiVersion: v2
 name: octavia
 description: A Helm chart for octavia
 type: application
-version: 2.1.2
-appVersion: 16.0.1-27-g8c28bc595-8-20
+version: 2.1.3
+appVersion: 16.0.1-27-g8c28bc595-9-21
 sources:
   - https://github.com/NeCTAR-RC/octavia-helm.git
 dependencies:
