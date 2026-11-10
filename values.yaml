@@ -117,7 +117,7 @@ health_manager:
   gateway:
     enabled: false
     kind: UDPRoute
-    apiVersion: "gateway.networking.k8s.io/v1alpha2"
+    apiVersion: "gateway.networking.k8s.io/v1"
     annotations: {}
     parentRefs:
       - name: default
